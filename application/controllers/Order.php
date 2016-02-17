@@ -19,6 +19,7 @@ class Order extends Application {
     function neworder() {
         //FIXME
         
+        $this->load->model("ordes");
         $order_num = $this->orders->highest() +1;
         
         $neworder = $this->orders->create();
