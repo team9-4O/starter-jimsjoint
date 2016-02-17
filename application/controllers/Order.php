@@ -19,7 +19,7 @@ class Order extends Application {
     function neworder() {
         //FIXME
         
-        $this->load->model("ordes");
+        $this->load->model("orders");
         $order_num = $this->orders->highest() +1;
         
         $neworder = $this->orders->create();
@@ -27,14 +27,14 @@ class Order extends Application {
         $neworder->date = date();
         $neworder->status='a';
         $neworder->total = '0';
-        $this->orers->add($neworder);
+        $this->orders->add($neworder);
         
         redirect('/order/display_menu/' . $order_num);
     }
 
     // add to an order
     function display_menu($order_num = null) {
-		$this->load->model('orders');
+        $this->load->model('orders');
         $this->load->model('orderitems');
 		
         if ($order_num == null)
@@ -93,13 +93,19 @@ class Order extends Application {
 
     // checkout
     function checkout($order_num) {
+        
+        $this->load->model('orders');
+        $this->load->model('orderitems');
+        
+        
         $this->data['title'] = 'Checking Out';
         $this->data['pagebody'] = 'show_order';
         $this->data['order_num'] = $order_num;
         
-		$this->data['total'] = number_format($this->orders->total(&order-num), 2);
+        $this->data['total'] = number_format($this->orders->total($order_num),2);
 
-		$items = $this->orderitems->group($order_num);
+
+        $items = $this->orderitems->group($order_num);
 		foreach($items as $item){
 			$menuitem = $this->menu->get($item->item);
 			$item->code = $menuitem->name;
@@ -111,7 +117,14 @@ class Order extends Application {
 
     // proceed with checkout
     function commit($order_num) {
-        //FIXME
+        $this->load->model("orders");
+        if(!$this->orders->validate($order_num))
+            redirect('/order/display_menu/' . $order_num);
+        $record = $this->orders->get($order_num);
+        $record->date = date(DATE_ATOM);
+        $record->status = 'c';
+        $record->total = $this->orders->total($order_num);
+        $this->orders->update($record);
         redirect('/');
     }
 
