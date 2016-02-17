@@ -38,4 +38,9 @@ class Orders extends MY_Model {
         return false;
     }
 
+    
+    function neworder(){
+        
+        
+    }
 }
